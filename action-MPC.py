@@ -5,7 +5,7 @@ import configparser
 from hermes_python.hermes import Hermes, MqttOptions
 #import datetime
 #import random
-#import toml
+import toml
 import subprocess
 
 
@@ -23,12 +23,16 @@ def subscribe_intent_callback(hermes, intent_message):
     intentname = intent_message.intent.intent_name
     if intentname == user_intent("lauter"):
         subprocess.call("mpc volume +5", shell=True)
+        text = "Ich habe lauter gestelt."
     elif intentname == user_intent("leiser"):
         subprocess.call("mpc volume -5", shell=True)
+        text = "Ich habe leiser gestelt."
     elif intentname == user_intent("stop"):
         subprocess.call("mpc stop", shell=True)
+        text = "Ich habe die Music gestops."
     elif intentname == user_intent("next"):
         subprocess.call("mpc next", shell=True)
+        text = "Ich habe weiter gestelt."
     elif intentname == user_intent("playcopy"):
         datetype = intent_message.slots.datetype.first().value
         if datetype['what'] == "musik":
