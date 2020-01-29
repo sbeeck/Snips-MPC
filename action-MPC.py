@@ -7,6 +7,7 @@ import toml
 import subprocess
 
 
+
 USERNAME_INTENTS = "sbeeck"
 MQTT_BROKER_ADDRESS = "localhost:1883"
 MQTT_USERNAME = None
