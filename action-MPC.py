@@ -19,28 +19,28 @@ def user_intent(intentname):
 
 
 def subscribe_intent_callback(hermes, intent_message):
-	intentname = intent_message.intent.intent_name
-	if intentname == user_intent("lauter"):
-		subprocess.call("mpc volume +5", shell=True)
-    	elif intentname == user_intent("leiser"):
-		subprocess.call("mpc volume -5", shell=True)
-    	elif intentname == user_intent("stop"):
-		subprocess.call("mpc stop", shell=True)
-	elif intentname == user_intent("next"):
-		subprocess.call("mpc next", shell=True)
-    	elif intentname == user_intent("playcopy"):
-		datetype = intent_message.slots.datetype.first().value
-			if datetype['what'] == "musik":
-				subprocess.call("mpc clear", shell=True)
-				subprocess.call("mpc load " + conf['secret']['radio_playlist'], shell=True)
-				text = "Das Radio wurde eingeschaltet."
-			elif datetype['what'] == "spiele":
-				subprocess.call("mpc clear", shell=True)
-				subprocess.call("mpc load " + user_intent['sender'] , shell=True)
-				text = "Der Sender " datetype['sender'] " wurde eingeschaltet."
-		session_id = data['sessionId']
-		mqtt_client.publish('hermes/dialogueManager/endSession', json.dumps({'text': text, "sessionId": session_id}))
-		subprocess.call("mpc play", shell=True)
+    intentname = intent_message.intent.intent_name
+    if intentname == user_intent("lauter"):
+        subprocess.call("mpc volume +5", shell=True)
+    elif intentname == user_intent("leiser"):
+        subprocess.call("mpc volume -5", shell=True)
+    elif intentname == user_intent("stop"):
+        subprocess.call("mpc stop", shell=True)
+    elif intentname == user_intent("next"):
+        subprocess.call("mpc next", shell=True)
+    elif intentname == user_intent("playcopy"):
+       datetype = intent_message.slots.datetype.first().value
+        if datetype['what'] == "musik":
+            subprocess.call("mpc clear", shell=True)
+            subprocess.call("mpc load " + conf['secret']['radio_playlist'], shell=True)
+            text = "Das Radio wurde eingeschaltet."
+        elif datetype['what'] == "spiele":
+            subprocess.call("mpc clear", shell=True)
+            subprocess.call("mpc load " + user_intent['sender'] , shell=True)
+            text = "Der Sender " datetype['sender'] " wurde eingeschaltet."
+        session_id = data['sessionId']
+        mqtt_client.publish('hermes/dialogueManager/endSession', json.dumps({'text': text, "sessionId": session_id}))
+        subprocess.call("mpc play", shell=True)
 
 
 if __name__ == "__main__":
