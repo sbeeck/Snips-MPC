@@ -32,14 +32,15 @@ def subscribe_intent_callback(hermes, intent_message):
 		subprocess.call("mpc next", shell=True)
 
     elif intentname == user_intent("playcopy"):
-			if user_intent['what'] == "musik":
+		datetype = intent_message.slots.datetype.first().value
+			if datetype['what'] == "musik":
 				subprocess.call("mpc clear", shell=True)
 				subprocess.call("mpc load " + conf['secret']['radio_playlist'], shell=True)
 				text = "Das Radio wurde eingeschaltet."
-			elif user_intent['what'] == "spiele":
+			elif datetype['what'] == "spiele":
 				subprocess.call("mpc clear", shell=True)
 				subprocess.call("mpc load " + user_intent['sender'] , shell=True)
-				text = "Der Sender " user_intent['sender'] " wurde eingeschaltet."
+				text = "Der Sender " datetype['sender'] " wurde eingeschaltet."
 			session_id = data['sessionId']
 			mqtt_client.publish('hermes/dialogueManager/endSession', json.dumps({'text': text, "sessionId": session_id}))
 			subprocess.call("mpc play", shell=True)
