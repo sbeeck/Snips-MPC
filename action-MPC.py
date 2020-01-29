@@ -29,7 +29,7 @@ def subscribe_intent_callback(hermes, intent_message):
     elif intentname == user_intent("next"):
         subprocess.call("mpc next", shell=True)
     elif intentname == user_intent("playcopy"):
-       datetype = intent_message.slots.datetype.first().value
+        datetype = intent_message.slots.datetype.first().value
         if datetype['what'] == "musik":
             subprocess.call("mpc clear", shell=True)
             subprocess.call("mpc load " + conf['secret']['radio_playlist'], shell=True)
