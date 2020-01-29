@@ -20,7 +20,7 @@ def user_intent(intentname):
     return USERNAME_INTENTS + ":" + intentname
 
 
-def subscribe_intent_callback(hermes, intent_message):
+def subscribe_intent_callback(hermes, intent_message, msg):
     intentname = intent_message.intent.intent_name
     data = json.loads(msg.payload.decode('utf8'))
     intentname = data['intent']['intentName']
