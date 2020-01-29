@@ -4,6 +4,7 @@ from hermes_python.hermes import Hermes, MqttOptions
 import datetime
 import random
 import toml
+import subprocess
 
 
 USERNAME_INTENTS = "sbeeck"
