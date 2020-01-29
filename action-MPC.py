@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-import paho.mqtt.client as mqtt
+from hermes_python.hermes import Hermes, MqttOptions
+import datetime
+import random
 import toml
-import json
-import subprocess
+
 
 USERNAME_INTENTS = "sbeeck"
 MQTT_BROKER_ADDRESS = "localhost:1883"
@@ -12,40 +12,37 @@ MQTT_USERNAME = None
 MQTT_PASSWORD = None
 
 
-def add_prefix(intent_name):
-    return USERNAME_INTENTS + ":" + intent_name
+def user_intent(intentname):
+    return USERNAME_INTENTS + ":" + intentname
 
 
-# MQTT client to connect to the bus
-mqtt_client = mqtt.Client()
+def subscribe_intent_callback(hermes, intent_message):
+    intentname = intent_message.intent.intent_name
 
+    if intentname == user_intent("lauter"):
+		subprocess.call("mpc volume +5", shell=True)
+	
+    elif intentname == user_intent("leiser"):
+		subprocess.call("mpc volume -5", shell=True)
 
-def on_connect(client, userdata, flags, rc):
-    client.subscribe("hermes/intent/#")
+	elif intentname == user_intent("stop"):
+		subprocess.call("mpc stop", shell=True)
 
+    elif intentname == user_intent("next"):
+		subprocess.call("mpc next", shell=True)
 
-def on_message(client, userdata, msg):
-    data = json.loads(msg.payload.decode('utf8'))
-    intentname = data['intent']['intentName']
-    if intentname == add_prefix("MPC"):
-        slots = parse_slots(data)
-        text = ""
-        if slots['what'] == "musik":
-            subprocess.call("mpc clear", shell=True)
-            subprocess.call("mpc load " + conf['secret']['radio_playlist'], shell=True)
-            text = "Das Radio wurde eingeschaltet."
-        elif slots['what'] == "spiele":
-            subprocess.call("mpc clear", shell=True)
-            subprocess.call("mpc load " + slots['sender'] , shell=True)
-            text = "Der Sender " slots['sender'] " wurde eingeschaltet."
-        session_id = data['sessionId']
-        mqtt_client.publish('hermes/dialogueManager/endSession', json.dumps({'text': text, "sessionId": session_id}))
-        subprocess.call("mpc play", shell=True)
-
-
-def parse_slots(data):
-    # We extract the slots as a dict
-    return {slot['slotName']: slot['value']['value'] for slot in data['slots']}
+    elif intentname == user_intent("playcopy"):
+			if user_intent['what'] == "musik":
+				subprocess.call("mpc clear", shell=True)
+				subprocess.call("mpc load " + conf['secret']['radio_playlist'], shell=True)
+				text = "Das Radio wurde eingeschaltet."
+			elif user_intent['what'] == "spiele":
+				subprocess.call("mpc clear", shell=True)
+				subprocess.call("mpc load " + user_intent['sender'] , shell=True)
+				text = "Der Sender " user_intent['sender'] " wurde eingeschaltet."
+			session_id = data['sessionId']
+			mqtt_client.publish('hermes/dialogueManager/endSession', json.dumps({'text': text, "sessionId": session_id}))
+			subprocess.call("mpc play", shell=True)
 
 
 if __name__ == "__main__":
@@ -57,7 +54,6 @@ if __name__ == "__main__":
     if 'mqtt_password' in snips_config['snips-common'].keys():
         MQTT_PASSWORD = snips_config['snips-common']['mqtt_password']
 
-    mqtt_client.on_connect = on_connect
-    mqtt_client.on_message = on_message
-    mqtt_client.connect(MQTT_BROKER_ADDRESS.split(":")[0], int(MQTT_BROKER_ADDRESS.split(":")[1]))
-    mqtt_client.loop_forever()
+    mqtt_opts = MqttOptions(username=MQTT_USERNAME, password=MQTT_PASSWORD, broker_address=MQTT_BROKER_ADDRESS)
+    with Hermes(mqtt_options=mqtt_opts) as h:
+        h.subscribe_intents(subscribe_intent_callback).start()
