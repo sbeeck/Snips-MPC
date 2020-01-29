@@ -38,7 +38,7 @@ def subscribe_intent_callback(hermes, intent_message):
         elif datetype['what'] == "spiele":
             subprocess.call("mpc clear", shell=True)
             subprocess.call("mpc load " + user_intent['sender'] , shell=True)
-            text = "Der Sender " datetype['sender'] " wurde eingeschaltet."
+            text = "Der Sender wurde eingeschaltet."
         session_id = data['sessionId']
         mqtt_client.publish('hermes/dialogueManager/endSession', json.dumps({'text': text, "sessionId": session_id}))
         subprocess.call("mpc play", shell=True)
