@@ -43,10 +43,9 @@ def subscribe_intent_callback(hermes, intent_message):
             subprocess.call("mpc clear", shell=True)
             subprocess.call("mpc load " + user_intent['sender'] , shell=True)
             text = "Der Sender wurde eingeschaltet."
-        session_id = data['sessionId']
-        mqtt_client.publish('hermes/dialogueManager/endSession', json.dumps({'text': text, "sessionId": session_id}))
         subprocess.call("mpc play", shell=True)
-
+    session_id = data['sessionId']
+    mqtt_client.publish('hermes/dialogueManager/endSession', json.dumps({'text': text, "sessionId": session_id}))
 
 if __name__ == "__main__":
     snips_config = toml.load('/etc/snips.toml')
